@@ -121,6 +121,11 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+.vscode
+*/nohup.out
+*/coverage
+*/test-report.xml
+*/cdk.out
 
 # yarn v2
 .yarn/cache

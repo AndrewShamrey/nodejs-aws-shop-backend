@@ -1,0 +1,140 @@
+openapi: 3.0.0
+info:
+  description: Product service API contracts
+  version: 1.0.0
+  title: Product Service
+servers:
+  - url: https://cglu0qwmn6.execute-api.eu-west-1.amazonaws.com/
+tags:
+  - name: product-service
+    description: Product API
+paths:
+  /products:
+    get:
+      x-lambda-name: getProductsList
+      tags:
+        - product-service
+      summary: List products
+      description: Get products list
+      operationId: getProductsList
+      responses:
+        '200':
+          $ref: '#/components/responses/productsListSuccess'
+        default:
+          $ref: '#/components/responses/default'
+  '/products/{productId}':
+    parameters:
+      - $ref: '#/components/parameters/productId'
+    get:
+      x-lambda-name: getProductsById
+      tags:
+        - product-service
+      summary: Product by productId
+      description: Get product details by its id
+      operationId: getProductsById
+      responses:
+        '200':
+          $ref: '#/components/responses/productSuccess'
+        default:
+          $ref: '#/components/responses/default'
+components:
+  parameters:
+    productId:
+      name: productId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: Product id
+      example: 48b21827-7476-44ab-ba71-0c49401f8495
+  responses:
+    productSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+    productsListSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBodyProductsList'
+    default:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBodyError'
+  schemas:
+    DateISO:
+      example: '2023-05-16T14:06:19.172Z'
+      pattern: '^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z)$'
+      type: string
+    Text:
+      example: Very long text
+      type: string
+    UUID:
+      example: 48b21827-7476-44ab-ba71-0c49401f8495
+      type: string
+    Product:
+      type: object
+      properties:
+        productId:
+          $ref: '#/components/schemas/UUID'
+        title:
+          example: Product title
+          type: string
+        price:
+          example: 300
+          type: number
+        creationDate:
+          $ref: '#/components/schemas/DateISO'
+        description:
+          $ref: '#/components/schemas/Text'
+      additionalProperties: false
+      required:
+        - creationDate
+        - price
+        - productId
+        - title
+    ResponseBodyProductsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
+    ResponseBodyError:
+      type: object
+      properties:
+        statusCode:
+          example: 400
+          type: number
+        message:
+          example: Invalid request
+          type: string
+        code:
+          example: BadRequestError
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                example: BadRequestError
+                type: string
+              message:
+                example: Invalid request
+                type: string
+            additionalProperties: false
+            required:
+              - code
+              - message
+        details:
+          example:
+            validation: productId field is missing
+      additionalProperties: false
+      required:
+        - code
+        - errors
+        - message
+        - statusCode
