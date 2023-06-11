@@ -13,7 +13,7 @@ type ErrorResponse = {
   /** @example BadRequestError */
   code: string;
   errors: ShortErrorResponse[];
-  /** @example { "validation": "productId field is missing" } */
+  /** @example { "validation": "id field is missing" } */
   details?: unknown;
 };
 

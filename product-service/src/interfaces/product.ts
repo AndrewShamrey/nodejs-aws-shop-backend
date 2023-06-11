@@ -1,12 +1,11 @@
-import { DateISO, Text, UUID } from 'interfaces/index';
+import { Text, UUID } from 'interfaces/index';
 
 interface Product {
-  productId: UUID;
+  id: UUID;
   /** @example Product title */
   title: string;
   /** @example 300 */
   price: number;
-  creationDate: DateISO;
   description?: Text;
 }
 

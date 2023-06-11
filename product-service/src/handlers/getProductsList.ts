@@ -4,18 +4,16 @@ import { getProductsList } from 'product/index';
 import logger from 'utils/logger';
 
 export const handler = apiGwProxy(async (event: APIGatewayProxyEvent, context: Context) => {
-  const { multiValueQueryStringParameters } = event;
   const { awsRequestId, functionName } = context;
 
-  logger.info({ awsRequestId, functionName }, 'List Products request');
-  logger.info(multiValueQueryStringParameters, 'Request Parameters');
+  logger.info({ awsRequestId, functionName, event }, 'List Products request');
 
   const products = await getProductsList();
 
   logger.info(
     {
       count: products.length,
-      items: products.map(({ productId }) => productId),
+      items: products.map(({ id }) => id),
     },
     'Products are found',
   );
