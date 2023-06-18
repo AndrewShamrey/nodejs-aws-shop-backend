@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import StatusCodes from 'http-status-codes';
-import { product } from '__testUtils__/samples/product';
+import { fullProduct } from '__testUtils__/samples/fullProduct';
 
-const getProductsById = jest.fn().mockResolvedValue(product);
+const getProductsById = jest.fn().mockResolvedValue(fullProduct);
 jest.mock('product/index', () => ({ getProductsById }));
 
 import { handler } from 'handlers/getProductsById';
@@ -15,14 +15,14 @@ describe('getProductsById', () => {
 
   it('should response with product', async () => {
     const event = ({
-      pathParameters: { productId: product.productId },
+      pathParameters: { productId: fullProduct.id },
     } as unknown) as APIGatewayProxyEvent;
 
     const response = (await handler(event, context, callback)) as APIGatewayProxyResult;
 
-    expect(getProductsById).toBeCalledWith(product.productId);
+    expect(getProductsById).toBeCalledWith(fullProduct.id);
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body).toEqual(JSON.stringify(product));
+    expect(response.body).toEqual(JSON.stringify(fullProduct));
   });
 
   it('should return 404 when no product presented', async () => {

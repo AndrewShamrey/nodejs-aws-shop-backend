@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 
 const runTime = new Date().toISOString();
 const runId = v4();
-const target = process.env.IS_TEST ? global['testStdout'] : process.stdout;
+const target = process.env.IS_TEST ? global['testStdout'] : console;
 
 enum LogLevel {
   INFO = 'INFO',
@@ -20,8 +20,8 @@ interface Logger {
 const createLogger = (): Logger => {
   const log = (level: LogLevel, data: unknown, message?: string): void => {
     const preparedData = JSON.stringify(data);
-    const logEntry = `${level}\t${preparedData}\t${message ?? ''}`;
-    target.write(logEntry);
+    const logEntry = `${level}${message ? '\t' + message : ''}\t${preparedData}`;
+    target.log(logEntry);
   };
 
   return {

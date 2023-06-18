@@ -10,6 +10,23 @@ tags:
     description: Product API
 paths:
   /products:
+    post:
+      x-lambda-name: createProduct
+      tags:
+        - product-service
+      summary: Create new Product
+      description: Create and return new product with provided data
+      operationId: createProduct
+      responses:
+        '200':
+          $ref: '#/components/responses/productSuccess'
+        default:
+          $ref: '#/components/responses/default'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyProductCreate'
     get:
       x-lambda-name: getProductsList
       tags:
@@ -29,7 +46,7 @@ paths:
       x-lambda-name: getProductsById
       tags:
         - product-service
-      summary: Product by productId
+      summary: Product by id
       description: Get product details by its id
       operationId: getProductsById
       responses:
@@ -53,7 +70,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Product'
+            $ref: '#/components/schemas/FullProduct'
     productsListSuccess:
       description: OK
       content:
@@ -67,10 +84,6 @@ components:
           schema:
             $ref: '#/components/schemas/ResponseBodyError'
   schemas:
-    DateISO:
-      example: '2023-05-16T14:06:19.172Z'
-      pattern: '^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z)$'
-      type: string
     Text:
       example: Very long text
       type: string
@@ -80,7 +93,7 @@ components:
     Product:
       type: object
       properties:
-        productId:
+        id:
           $ref: '#/components/schemas/UUID'
         title:
           example: Product title
@@ -88,20 +101,70 @@ components:
         price:
           example: 300
           type: number
-        creationDate:
-          $ref: '#/components/schemas/DateISO'
         description:
           $ref: '#/components/schemas/Text'
       additionalProperties: false
       required:
-        - creationDate
-        - price
-        - productId
+        - id
         - title
+        - price
+    Stock:
+      type: object
+      properties:
+        product_id:
+          $ref: '#/components/schemas/UUID'
+        count:
+          example: 20
+          type: number
+      additionalProperties: false
+      required:
+        - product_id
+        - count
+    FullProduct:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          example: Product title
+          type: string
+        price:
+          example: 300
+          type: number
+        count:
+          example: 20
+          type: number
+        description:
+          $ref: '#/components/schemas/Text'
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - price
+        - count
+    RequestBodyProductCreate:
+      type: object
+      properties:
+        title:
+          example: Product title
+          type: string
+        price:
+          example: 300
+          type: number
+        count:
+          example: 20
+          type: number
+        description:
+          $ref: '#/components/schemas/Text'
+      additionalProperties: false
+      required:
+        - title
+        - price
+        - count
     ResponseBodyProductsList:
       type: array
       items:
-        $ref: '#/components/schemas/Product'
+        $ref: '#/components/schemas/FullProduct'
     ResponseBodyError:
       type: object
       properties:
@@ -131,7 +194,7 @@ components:
               - message
         details:
           example:
-            validation: productId field is missing
+            validation: id field is missing
       additionalProperties: false
       required:
         - code

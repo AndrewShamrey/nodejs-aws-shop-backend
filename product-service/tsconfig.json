@@ -18,7 +18,8 @@
       "product/*": ["src/product/*"],
       "utils/*": ["src/utils/*"],
       "__testUtils__/*": ["__testUtils__/*"],
-      "mocks/*": ["mocks/*"]
+      "mocks/*": ["mocks/*"],
+      "db/*": ["db/*"]
     },
     "typeRoots": ["./node_modules/@types"]
   },

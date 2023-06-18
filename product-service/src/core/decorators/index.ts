@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, Context } from 'aws-lambda';
-import { enableCORS, handleError } from 'core/decorators/helpers';
+import { enableCORS, handleError, validateContentType } from 'core/decorators/helpers';
 import { COMMON_LOGIC_ERROR } from 'utils/constants';
 import Response from 'core/responses/Response';
 import logger from 'utils/logger';
@@ -27,6 +27,8 @@ const apiGwProxy = <EventType = APIGatewayProxyEvent>(
   handler: (event: EventType, context: Context) => Promise<Response | unknown>,
 ): APIGatewayProxyHandler => async (awsEvent, awsContext) => {
   try {
+    validateContentType(awsEvent);
+
     const result = await commonLogic(awsEvent, awsContext, handler);
     const backendResponse = Response.from(result).serialize();
 

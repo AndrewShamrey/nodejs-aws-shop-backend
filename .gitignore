@@ -126,6 +126,7 @@ dist
 */coverage
 */test-report.xml
 */cdk.out
+*/docker-compose.yml
 
 # yarn v2
 .yarn/cache
