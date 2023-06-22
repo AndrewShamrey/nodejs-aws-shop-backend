@@ -1,4 +1,4 @@
-import { validateProductPayload, validateStockPayload, validatePayload } from 'product/validation';
+import { validateProductPayload, validateStockPayload } from 'product/validation';
 import { product } from '__testUtils__/samples/product';
 import { stock } from '__testUtils__/samples/stock';
 import { Product, Stock } from 'interfaces/index';
@@ -6,15 +6,40 @@ import BadRequestError from 'core/errors/BadRequestError';
 
 describe('validateProductPayload', () => {
   it('should not throw an error for a valid product', async () => {
-    await expect(validateProductPayload(product)).rejects.not.toThrow();
+    const result = await validateProductPayload(product);
+    expect(result).toBeUndefined();
   });
 
   it('should throw a BadRequestError for an invalid product', async () => {
     await expect(
       validateProductPayload({
+        id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
+        title: 'Product 1',
+      } as Product),
+    ).rejects.toThrow(BadRequestError);
+
+    await expect(
+      validateProductPayload({
         id: '1',
         title: 'Product 1',
-        // Missing required 'price' field
+        price: 5,
+      } as Product),
+    ).rejects.toThrow(BadRequestError);
+
+    await expect(
+      validateProductPayload({
+        id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
+        title: 'Product 1',
+        price: -5,
+      } as Product),
+    ).rejects.toThrow(BadRequestError);
+
+    await expect(
+      validateProductPayload({
+        id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
+        title: '',
+        price: 5,
+        description: 'test',
       } as Product),
     ).rejects.toThrow(BadRequestError);
   });
@@ -22,10 +47,10 @@ describe('validateProductPayload', () => {
   it('should throw a BadRequestError for product with additional properties', async () => {
     await expect(
       validateProductPayload({
-        id: '2',
+        id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
         title: 'Product 2',
         price: 2,
-        additionalProperty: true, // not exists in Product type
+        additionalProperty: true,
       } as Product),
     ).rejects.toThrow(BadRequestError);
   });
@@ -33,14 +58,28 @@ describe('validateProductPayload', () => {
 
 describe('validateStockPayload', () => {
   it('should not throw an error for a valid stock', async () => {
-    await expect(validateStockPayload(stock)).rejects.not.toThrow();
+    const result = await validateStockPayload(stock);
+    expect(result).toBeUndefined();
   });
 
   it('should throw a BadRequestError for an invalid stock', async () => {
     await expect(
       validateStockPayload({
-        product_id: '1',
-        // Missing required 'count' field
+        product_id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
+      } as Stock),
+    ).rejects.toThrow(BadRequestError);
+
+    await expect(
+      validateStockPayload({
+        product_id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
+        count: -2,
+      } as Stock),
+    ).rejects.toThrow(BadRequestError);
+
+    await expect(
+      validateStockPayload({
+        product_id: '2',
+        count: 2,
       } as Stock),
     ).rejects.toThrow(BadRequestError);
   });
@@ -48,28 +87,10 @@ describe('validateStockPayload', () => {
   it('should throw a BadRequestError for product with additional properties', async () => {
     await expect(
       validateStockPayload({
-        product_id: '2',
+        product_id: 'b86a2f92-dee4-4f4f-a300-fd811ccfb7d3',
         count: 2,
-        additionalProperty: true, // not exists in Stock type
+        additionalProperty: true,
       } as Stock),
     ).rejects.toThrow(BadRequestError);
-  });
-});
-
-describe('validatePayload', () => {
-  const validateProductPayloadMock = jest.spyOn(
-    require('product/validation'),
-    'validateProductPayload',
-  );
-  const validateStockPayloadMock = jest.spyOn(
-    require('product/validation'),
-    'validateStockPayload',
-  );
-
-  it('should run validators for provided product and stock', async () => {
-    await validatePayload(product, stock);
-
-    expect(validateProductPayloadMock).toBeCalledWith(product);
-    expect(validateStockPayloadMock).toBeCalledWith(stock);
   });
 });

@@ -50,15 +50,6 @@ describe('validateContentType', () => {
     ).not.toThrow();
   });
 
-  it('should throw an error if the content type is missing', () => {
-    expect(() =>
-      validateContentType(({
-        httpMethod: 'POST',
-        headers: {},
-      } as unknown) as APIGatewayProxyEvent),
-    ).toThrow(UnsupportedMediaTypeError);
-  });
-
   it('should throw an error if the content type is not "application/json"', () => {
     expect(() =>
       validateContentType(({

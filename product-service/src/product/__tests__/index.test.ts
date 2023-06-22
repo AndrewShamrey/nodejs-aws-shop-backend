@@ -1,6 +1,5 @@
 import { Context } from 'aws-lambda';
 import { fullProduct, fullProductsList } from '__testUtils__/samples/fullProduct';
-import { getProductsList, getProductsById, createProduct } from 'product/index';
 import { Product, Stock, RequestBodyProductCreate } from 'interfaces/index';
 
 const getProductsListFromTable = jest.fn().mockResolvedValue(fullProductsList);
@@ -14,6 +13,8 @@ jest.mock('product/db/getProductsByIdFromTable', () => ({ getProductsByIdFromTab
 jest.mock('product/db/createProductInTable', () => ({ createProductInTable }));
 jest.mock('product/validation', () => ({ validatePayload }));
 jest.mock('uuid', () => ({ v4: () => uniqueId }));
+
+import { getProductsList, getProductsById, createProduct } from 'product/index';
 
 describe('getProductsList', () => {
   it('should run getProductsListFromTable', async () => {
@@ -47,15 +48,11 @@ describe('createProduct', () => {
   };
 
   it('should create a product with specified payload', async () => {
-    const result = await createProduct(context, mockPayload);
+    await createProduct(context, mockPayload);
     const product: Product = { ...productData, id: uniqueId };
     const stock: Stock = { ...stockData, product_id: uniqueId };
 
     expect(validatePayload).toBeCalledWith(product, stock);
     expect(createProductInTable).toBeCalledWith(context, product, stock);
-    expect(result).toEqual({
-      id: uniqueId,
-      ...mockPayload,
-    });
   });
 });

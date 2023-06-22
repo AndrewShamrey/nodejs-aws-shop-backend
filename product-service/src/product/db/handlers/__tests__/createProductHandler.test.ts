@@ -11,8 +11,8 @@ describe('createProductHandler', () => {
       then: jest.fn(),
     };
 
-    const trx: Knex.Transaction = (mockTransaction as unknown) as Knex.Transaction;
-    const fullProduct = await createProductHandler(trx, product, stock);
+    const trx = () => mockTransaction;
+    const fullProduct = await createProductHandler((trx as unknown) as Knex.Transaction, product, stock);
 
     expect(mockTransaction.insert).toBeCalledWith(product);
     expect(mockTransaction.insert).toBeCalledWith(stock);
