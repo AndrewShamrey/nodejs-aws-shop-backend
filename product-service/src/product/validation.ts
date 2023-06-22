@@ -8,17 +8,17 @@ const requiredNumber = () => yup.number().required();
 
 const ProductSchema = yup
   .object({
-    id: requiredString(),
-    title: requiredString(),
-    price: requiredNumber(),
+    id: requiredString().uuid(),
+    title: requiredString().min(1),
+    price: requiredNumber().min(0),
     description: yup.string(),
   })
   .noUnknown(true);
 
 const StockSchema = yup
   .object({
-    product_id: requiredString(),
-    count: requiredNumber(),
+    product_id: requiredString().uuid(),
+    count: requiredNumber().min(0),
   })
   .noUnknown(true);
 

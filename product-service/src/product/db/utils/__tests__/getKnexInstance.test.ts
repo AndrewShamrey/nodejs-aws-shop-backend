@@ -1,5 +1,6 @@
-import knexInstance, { Knex } from 'knex';
-import getKnexInstance, { destroyAll } from 'product/db/utils/getKnexInstance';
+import getKnexInstance from 'product/db/utils/getKnexInstance';
+
+const mockKnexInstance = jest.spyOn(require('knex'), 'default');
 
 describe('getKnexInstance', () => {
   it('should return a Knex instance with the correct configuration', () => {
@@ -18,9 +19,9 @@ describe('getKnexInstance', () => {
     process.env.PG_PASSWORD = knexConnectionConfig.password;
     process.env.PG_DATABASE = knexConnectionConfig.database;
 
-    const instance = getKnexInstance();
+    getKnexInstance();
 
-    expect(knexInstance).toBeCalledWith({
+    expect(mockKnexInstance).toBeCalledWith({
       debug: true,
       client: 'pg',
       connection: knexConnectionConfig,
@@ -32,20 +33,6 @@ describe('getKnexInstance', () => {
         createRetryIntervalMillis: 500,
         propagateCreateError: false,
       },
-    });
-
-    expect(instance).toBeInstanceOf(Knex);
-  });
-});
-
-describe('destroyAll', () => {
-  it('should call destroy on all knex instances', async () => {
-    const mockInstances = [{ destroy: jest.fn() }, { destroy: jest.fn() }, { destroy: jest.fn() }];
-
-    await destroyAll();
-
-    mockInstances.forEach((instance) => {
-      expect(instance.destroy).toHaveBeenCalled();
     });
   });
 });

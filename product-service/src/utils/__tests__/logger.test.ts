@@ -17,7 +17,7 @@ describe('logger', () => {
     jest.mock('uuid', () => ({ v4: () => runId }));
 
     global['testStdout'] = {
-      write: (text: string) => {
+      log: (text: string) => {
         logs.push(text);
       },
     };
