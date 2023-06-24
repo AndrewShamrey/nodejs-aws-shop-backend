@@ -1,4 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyHandler, Context } from 'aws-lambda';
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyHandler,
+  SQSEvent,
+  Handler,
+  Context,
+} from 'aws-lambda';
 import { enableCORS, handleError, validateContentType } from 'core/decorators/helpers';
 import { COMMON_LOGIC_ERROR } from 'utils/constants';
 import Response from 'core/responses/Response';
@@ -39,4 +45,14 @@ const apiGwProxy = <EventType = APIGatewayProxyEvent>(
   }
 };
 
-export { apiGwProxy };
+const sqs = (
+  handler: (event: SQSEvent, context: Context) => Promise<unknown>,
+): Handler<SQSEvent, unknown> => async (awsEvent, awsContext) => {
+  try {
+    return await commonLogic(awsEvent, awsContext, handler);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export { apiGwProxy, sqs };

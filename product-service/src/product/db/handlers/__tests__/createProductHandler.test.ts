@@ -12,7 +12,11 @@ describe('createProductHandler', () => {
     };
 
     const trx = () => mockTransaction;
-    const fullProduct = await createProductHandler((trx as unknown) as Knex.Transaction, product, stock);
+    const fullProduct = await createProductHandler(
+      (trx as unknown) as Knex.Transaction,
+      product,
+      stock,
+    );
 
     expect(mockTransaction.insert).toBeCalledWith(product);
     expect(mockTransaction.insert).toBeCalledWith(stock);
