@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  description: Import service API contracts
+  version: 1.0.0
+  title: Import Service
+servers:
+  - url: https://fb17o516yi.execute-api.eu-west-1.amazonaws.com/prod/
+tags:
+  - name: import-service
+    description: Import API
+paths:
+  /import:
+    get:
+      x-lambda-name: importProductsFile
+      tags:
+        - import-service
+      parameters:
+        - $ref: '#/components/parameters/fileName'
+      summary: Import Products File
+      description: Import Products File
+      operationId: importProductsFile
+      responses:
+        '200':
+          $ref: '#/components/responses/ImportSuccess'
+        default:
+          $ref: '#/components/responses/default'
+components:
+  parameters:
+    fileName:
+      name: name
+      in: query
+      schema:
+        type: string
+      required: true
+      description: File name
+      example: fileName
+  responses:
+    ImportSuccess:
+      description: OK
+      content:
+        text/plain:
+          schema:
+            $ref: '#/components/schemas/SignedUrl'
+    default:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBodyError'
+  schemas:
+    SignedUrl:
+      example: https://aws-developer-shop-import-backend-bucket.s3.eu-west-1.amazonaws.com/uploaded/fileName.csv?Credentials&x-id=PutObject
+      type: string
+    ResponseBodyError:
+      type: object
+      properties:
+        statusCode:
+          example: 400
+          type: number
+        message:
+          example: Invalid request
+          type: string
+        code:
+          example: BadRequestError
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                example: BadRequestError
+                type: string
+              message:
+                example: Invalid request
+                type: string
+            additionalProperties: false
+            required:
+              - code
+              - message
+        details:
+          example:
+            validation: id field is missing
+      additionalProperties: false
+      required:
+        - code
+        - errors
+        - message
+        - statusCode
