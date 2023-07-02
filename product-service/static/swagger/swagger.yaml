@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   title: Product Service
 servers:
-  - url: https://cglu0qwmn6.execute-api.eu-west-1.amazonaws.com/
+  - url: https://lrznfwuq7h.execute-api.eu-north-1.amazonaws.com
 tags:
   - name: product-service
     description: Product API

@@ -4,7 +4,7 @@ import { App, Stack, Duration } from 'aws-cdk-lib';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
-import { Vpc, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { Topic, Subscription, SubscriptionProtocol, SubscriptionFilter } from 'aws-cdk-lib/aws-sns';
 import * as dotenv from 'dotenv';
@@ -19,7 +19,10 @@ const SUBSCRIPTION_NUMERIC_FILTER_FOR_COUNT = 10;
 const app = new App();
 const stack = new Stack(app, process.env.STACK_ID, {
   stackName: STACK_NAME,
-  env: { region: process.env.DEFAULT_REGION },
+  env: {
+    account: process.env.AWS_ACCOUNT_ID,
+    region: process.env.DEFAULT_REGION,
+  },
   description: 'The Cloud Formation Stack to manage Product Service resources',
 });
 
@@ -48,34 +51,13 @@ new Subscription(stack, process.env.CREATE_PRODUCT_TOPIC_SUBSCRIPTION_FILTERED, 
   },
 });
 
-const vpc = new Vpc(stack, process.env.LAMBDA_VPC_ID, {
-  cidr: Vpc.DEFAULT_CIDR_RANGE,
-  subnetConfiguration: [
-    {
-      name: process.env.VPC_PRIVATE_SUBNET_NAME,
-      subnetType: SubnetType.PRIVATE_WITH_EGRESS,
-      cidrMask: 24,
-    },
-    {
-      name: process.env.VPC_PUBLIC_SUBNET_NAME,
-      subnetType: SubnetType.PUBLIC,
-      cidrMask: 24,
-    },
-    {
-      name: process.env.VPC_ISOLATED_SUBNET_NAME,
-      subnetType: SubnetType.PRIVATE_ISOLATED,
-      cidrMask: 28,
-    },
-  ],
-});
+const vpc = Vpc.fromLookup(stack, process.env.DEFAULT_VPC_FOR_LAMBDAS_ID, { vpcId: process.env.DEFAULT_VPC_ID });
 
 const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   runtime: Runtime.NODEJS_18_X,
   timeout: Duration.seconds(COMMON_LAMBDA_TIMEOUT),
   vpc,
-  vpcSubnets: {
-    subnetType: SubnetType.PRIVATE_WITH_EGRESS,
-  },
+  allowPublicSubnet: true,
   environment: {
     PG_HOST: process.env.PG_HOST,
     PG_PORT: process.env.PG_PORT,
