@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   title: Import Service
 servers:
-  - url: https://fb17o516yi.execute-api.eu-west-1.amazonaws.com/prod/
+  - url: https://n3pn2plh42.execute-api.eu-north-1.amazonaws.com/prod/
 tags:
   - name: import-service
     description: Import API
@@ -49,7 +49,7 @@ components:
             $ref: '#/components/schemas/ResponseBodyError'
   schemas:
     SignedUrl:
-      example: https://aws-developer-shop-import-backend-bucket.s3.eu-west-1.amazonaws.com/uploaded/fileName.csv?Credentials&x-id=PutObject
+      example: https://aws-developer-shop-import-backend-bucket.s3.eu-north-1.amazonaws.com/uploaded/fileName.csv?Credentials&x-id=PutObject
       type: string
     ResponseBodyError:
       type: object
