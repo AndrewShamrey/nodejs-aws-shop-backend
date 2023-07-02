@@ -28,7 +28,11 @@ describe('getProductsByIdFromTable', () => {
     const result = await getProductsByIdFromTable(productId);
 
     expect(getKnexInstance).toBeCalled();
-    expect(mockKnexInstance.join).toBeCalledWith(stocksTable, `${productsTable}.id`, `${stocksTable}.product_id`);
+    expect(mockKnexInstance.join).toBeCalledWith(
+      stocksTable,
+      `${productsTable}.id`,
+      `${stocksTable}.product_id`,
+    );
     expect(mockKnexInstance.select).toBeCalledWith(`${productsTable}.*`, `${stocksTable}.count`);
     expect(mockKnexInstance.where).toBeCalledWith({ [`${productsTable}.id`]: productId });
     expect(mockKnexInstance.then).toBeCalled();
@@ -41,7 +45,10 @@ describe('getProductsByIdFromTable', () => {
     mockKnexInstance.then.mockRejectedValueOnce(errorMock);
 
     await expect(getProductsByIdFromTable(productId)).rejects.toThrowError(errorMock);
-    expect(logger.error).toBeCalledWith({ productId, error: errorMock }, 'Get Product by Id failed');
+    expect(logger.error).toBeCalledWith(
+      { productId, error: errorMock },
+      'Get Product by Id failed',
+    );
     expect(destroy).toBeCalled();
   });
 });

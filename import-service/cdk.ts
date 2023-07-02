@@ -2,6 +2,7 @@ import { App, Stack, Duration } from 'aws-cdk-lib';
 import { RestApi, Cors, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Bucket, EventType } from 'aws-cdk-lib/aws-s3';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as dotenv from 'dotenv';
@@ -19,6 +20,7 @@ const stack = new Stack(app, process.env.STACK_ID, {
 });
 
 const bucket = Bucket.fromBucketName(stack, process.env.BUCKET_ID, BUCKET_NAME);
+const queue = Queue.fromQueueArn(stack, process.env.QUEUE_ID, process.env.QUEUE_ARN);
 
 const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   runtime: Runtime.NODEJS_18_X,
@@ -28,6 +30,7 @@ const sharedLambdaProps: Partial<NodejsFunctionProps> = {
     IMPORT_BUCKET_NAME: BUCKET_NAME,
     UPLOAD_FOLDER_NAME: process.env.UPLOAD_FOLDER_NAME,
     PARSED_FOLDER_NAME: process.env.PARSED_FOLDER_NAME,
+    IMPORT_QUEUE_URL: queue.queueUrl,
   },
 };
 
@@ -60,6 +63,7 @@ api.root.addResource('import').addMethod('GET', new LambdaIntegration(importProd
   requestParameters: { 'method.request.querystring.name': true },
 });
 
+queue.grantSendMessages(importFileParser);
 bucket.grantReadWrite(importProductsFile);
 bucket.grantReadWrite(importFileParser);
 bucket.grantDelete(importFileParser);

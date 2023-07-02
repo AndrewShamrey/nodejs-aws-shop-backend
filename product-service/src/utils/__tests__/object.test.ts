@@ -8,7 +8,9 @@ describe('clean', () => {
       string: 'string',
       object: {},
       array: ['a', 'b'],
-      function: () => { /**/ },
+      function: () => {
+        /**/
+      },
       null: null,
     };
 

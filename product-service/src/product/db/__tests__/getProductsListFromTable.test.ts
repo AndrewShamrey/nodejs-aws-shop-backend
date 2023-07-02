@@ -26,7 +26,11 @@ describe('getProductsListFromTable', () => {
     const result = await getProductsListFromTable();
 
     expect(getKnexInstance).toBeCalled();
-    expect(mockKnexInstance.join).toBeCalledWith(stocksTable, `${productsTable}.id`, `${stocksTable}.product_id`);
+    expect(mockKnexInstance.join).toBeCalledWith(
+      stocksTable,
+      `${productsTable}.id`,
+      `${stocksTable}.product_id`,
+    );
     expect(mockKnexInstance.select).toBeCalledWith(`${productsTable}.*`, `${stocksTable}.count`);
     expect(mockKnexInstance.then).toBeCalled();
     expect(result).toEqual(fullProductsList);
