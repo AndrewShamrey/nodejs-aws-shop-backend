@@ -1,5 +1,12 @@
 import { App, Stack, Duration } from 'aws-cdk-lib';
-import { RestApi, Cors, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
+import {
+  RestApi,
+  Cors,
+  LambdaIntegration,
+  TokenAuthorizer,
+  ResponseType,
+} from 'aws-cdk-lib/aws-apigateway';
+import { PolicyDocument, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Bucket, EventType } from 'aws-cdk-lib/aws-s3';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Queue } from 'aws-cdk-lib/aws-sqs';
@@ -48,6 +55,35 @@ const importFileParser = new NodejsFunction(stack, process.env.IMPORT_FILE_PARSE
   description: 'Lambda Function to parse csv file',
 });
 
+const authorizerLambda = NodejsFunction.fromFunctionArn(
+  stack,
+  process.env.AUTHORIZER_LAMBDA_ID,
+  process.env.AUTHORIZER_LAMBDA_ARN,
+);
+
+const authRole = new Role(stack, process.env.AUTHORIZER_ROLE_ID, {
+  roleName: process.env.AUTHORIZER_ROLE_NAME,
+  assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
+  inlinePolicies: {
+    allowLambdaInvocation: PolicyDocument.fromJson({
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Action: ['lambda:InvokeFunction', 'lambda:InvokeAsync'],
+          Resource: authorizerLambda.functionArn,
+        },
+      ],
+    }),
+  },
+});
+
+const authorizer = new TokenAuthorizer(stack, process.env.TOKEN_AUTHORIZER_ID, {
+  authorizerName: process.env.TOKEN_AUTHORIZER_NAME,
+  handler: authorizerLambda,
+  assumeRole: authRole,
+});
+
 const api = new RestApi(stack, process.env.API_ID, {
   restApiName: process.env.API_NAME,
   defaultCorsPreflightOptions: {
@@ -61,6 +97,23 @@ const api = new RestApi(stack, process.env.API_ID, {
 
 api.root.addResource('import').addMethod('GET', new LambdaIntegration(importProductsFile), {
   requestParameters: { 'method.request.querystring.name': true },
+  authorizer,
+});
+
+const responseHeaders = {
+  'Access-Control-Allow-Origin': "'*'",
+  'Access-Control-Allow-Headers': "'*'",
+  'Access-Control-Allow-Methods': "'GET'",
+};
+
+api.addGatewayResponse(process.env.ACCESS_DENIED_GW_RESPONSE, {
+  type: ResponseType.ACCESS_DENIED,
+  responseHeaders,
+});
+
+api.addGatewayResponse(process.env.UNAUTHORIZED_GW_RESPONSE, {
+  type: ResponseType.UNAUTHORIZED,
+  responseHeaders,
 });
 
 queue.grantSendMessages(importFileParser);

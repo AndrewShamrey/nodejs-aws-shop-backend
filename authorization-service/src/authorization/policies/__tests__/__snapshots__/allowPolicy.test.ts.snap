@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`allowPolicy should return valid allow policy object 1`] = `
+Object {
+  "context": undefined,
+  "policyDocument": Object {
+    "Statement": Array [
+      Object {
+        "Action": "execute-api:Invoke",
+        "Effect": "Allow",
+        "Resource": "*",
+      },
+    ],
+    "Version": "2012-10-17",
+  },
+  "principalId": "apigateway.amazonaws.com",
+}
+`;
+
+exports[`allowPolicy should return valid allow policy object 2`] = `
+Object {
+  "context": undefined,
+  "policyDocument": Object {
+    "Statement": Array [
+      Object {
+        "Action": "execute-api:Invoke",
+        "Effect": "Allow",
+        "Resource": "*",
+      },
+    ],
+    "Version": "2012-10-17",
+  },
+  "principalId": "test-id",
+}
+`;

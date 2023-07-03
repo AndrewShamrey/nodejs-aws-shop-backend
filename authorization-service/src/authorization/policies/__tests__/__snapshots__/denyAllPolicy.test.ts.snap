@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`denyAllPolicy should return valid denyAll policy object 1`] = `
+Object {
+  "policyDocument": Object {
+    "Statement": Array [
+      Object {
+        "Action": "*",
+        "Effect": "Deny",
+        "Resource": "*",
+      },
+    ],
+    "Version": "2012-10-17",
+  },
+  "principalId": "*",
+}
+`;
