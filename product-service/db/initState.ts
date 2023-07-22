@@ -14,6 +14,7 @@ const initDBStateUp = async (): Promise<void> => {
       table.string('title').notNullable();
       table.text('description');
       table.integer('price');
+      table.string('image');
     });
   }
 

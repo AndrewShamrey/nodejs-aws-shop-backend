@@ -5,6 +5,7 @@ type RequestBodyProductCreate = {
   price: Product['price'];
   count: Stock['count'];
   description?: Product['description'];
+  image?: Product['image'];
 };
 
 export { RequestBodyProductCreate };
