@@ -26,13 +26,14 @@ const createProduct = async (
   payload: RequestBodyProductCreate,
 ): Promise<ResponseBodyProduct> => {
   const productId = v4();
-  const { title, price, count, description } = payload;
+  const { title, price, count, description, image = process.env.DEFAULT_IMG_URL } = payload;
 
   const product: Product = clean({
     id: productId,
     title,
     price,
     description,
+    image,
   });
 
   const stock: Stock = clean({

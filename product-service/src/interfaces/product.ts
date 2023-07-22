@@ -7,6 +7,8 @@ interface Product {
   /** @example 300 */
   price: number;
   description?: Text;
+  /** @example https://i.imgur.com/FgTsHwF.jpg */
+  image?: string;
 }
 
 type ProductsList = Product[];

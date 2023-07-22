@@ -12,6 +12,7 @@ const ProductSchema = yup
     title: requiredString().min(1),
     price: requiredNumber().min(0),
     description: yup.string(),
+    image: yup.string(),
   })
   .noUnknown(true);
 

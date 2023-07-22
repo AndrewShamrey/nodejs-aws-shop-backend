@@ -68,6 +68,7 @@ const sharedLambdaProps: Partial<NodejsFunctionProps> = {
     PG_STOCKS_TABLE: process.env.PG_STOCKS_TABLE,
     PRODUCT_AWS_REGION: process.env.DEFAULT_REGION,
     CREATE_PRODUCT_TOPIC_ARN: createProductTopic.topicArn,
+    DEFAULT_IMG_URL: process.env.DEFAULT_IMG_URL,
   },
   bundling: {
     externalModules: [
