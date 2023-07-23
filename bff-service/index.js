@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require("cors");
 require('dotenv').config();
 const StatusCodes = require('http-status-codes').default;
 const axios = require('axios').default;
@@ -7,6 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const modifiers = {};
 
+app.use(cors());
 app.use(express.json());
 
 app.all('/*', (req, res) => {
