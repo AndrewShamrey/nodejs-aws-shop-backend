@@ -3,10 +3,15 @@ const cors = require("cors");
 require('dotenv').config();
 const StatusCodes = require('http-status-codes').default;
 const axios = require('axios').default;
+const NodeCache = require('node-cache');
+
+const isGetProductsListRequest = (method, originalUrl) => method === 'GET' && originalUrl.endsWith('/products');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const CACHE_TTL = 2 * 60; // seconds
 const modifiers = {};
+const cache = new NodeCache();
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +26,16 @@ app.all('/*', (req, res) => {
   console.log('Recipient URL was mapped from environment variables', { recipientURL });
 
   if (recipientURL) {
+    const isRequestCacheable = [isGetProductsListRequest(method, originalUrl)].some(Boolean);
+    if (isRequestCacheable && cache.has(recipient)) {
+      const { status, data } = cache.get(recipient);
+      const ttl = cache.getTtl(recipient);
+      console.log(`Data was received from cache. Cache will be expired at ${new Date(ttl)}`, data);
+
+      res.status(status).json(data);
+      return;
+    };
+
     const lowerHeaders = Object.fromEntries(
       Object.entries(initHeaders)
         .map(([key, value]) => [key.toLowerCase(), value])
@@ -44,6 +59,12 @@ app.all('/*', (req, res) => {
 
         const modifier = modifiers[recipient];
         const preparedData = modifier ? modifier(data) : data;
+
+        if (isRequestCacheable) {
+          cache.set(recipient, { status, data }, CACHE_TTL);
+          console.log(`Data was cached and will be expired at ${new Date(Date.now() + (CACHE_TTL * 1000))}`);
+        }
+
         res.status(status).json(preparedData);
       })
       .catch((error) => {
